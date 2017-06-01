@@ -1,0 +1,249 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+ <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div id="panel" class="z-depth-5">
+
+<div id="choose">
+	<h1 class="center">Who do you want to play against?</h1>
+	<div class="center" style="">
+
+    <button class="waves-effect waves-light btn-large " style="left:0; right:0;  margin: 0 auto; display:inline-block;" id="rp"><i class="material-icons" style="font-size: 40px">perm_identity</i></button>
+    <button class="waves-effect waves-light btn-large " style="left:0; right:0;  margin: 0 auto; display:inline-block;" id="ai"><i class="material-icons" style="font-size: 40px">android</i></button>
+
+    </div>
+    
+</div>
+<div class="canv">
+	<ul class="boxes">
+		<li class="1"></li>
+		<li class="2"></li>
+		<li class="3"></li>
+		<li class="4"></li>
+		<li class="5"></li>
+		<li class="6"></li>
+		<li class="7"></li>
+		<li class="8"></li>
+		<li class="9"></li>
+	</ul>
+    	<canvas id="mycanv"></canvas>
+    </div>
+
+</div>
+<div class="start">
+	<h1 class="center">Please choose a username</h1>
+<input class="center"id="username" placeholder="Username"></input>
+<button class="waves-effect waves-light btn" style="left:0; right:0; margin:auto; display:block;" id="login">Join</button>
+</div>
+<div>
+<p class="center bottom" style="width:100vw">Status: <span id="s">Not connected</span></p>
+</div>
+
+<!-- Modal Structure -->
+  <div id="full" class="modal">
+    <div class="modal-content">
+      <h4>The lobby was full</h4>
+      <p>Sorry, please try again later</p>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+    </div>
+  </div>
+
+</body>
+<style>
+body{
+	background-color:white;
+}
+li{
+	float:left;
+	width:33.3333%;
+	height:33.3333%;
+}
+.boxes {
+	z-index:999;
+	margin:0;
+	height:50vh;
+	width:50vh;
+	position:absolute;
+    }
+#mycanv{
+	position: relative;
+	background-color: #428bca;
+	display:none;
+	height:100%;
+	width:100%;
+}
+.canv{
+
+	display:none;
+	margin:auto;
+	left:0;
+	right:0;
+	top:0;
+	bottom:0;
+	width:50vh;
+	height:50vh;
+	background-color: white;
+}
+#panel{
+	background-color:white;
+	margin-top:10%;
+	display:none;
+	width:100vw;
+	height:80%;
+
+}
+.bottom{
+	position:fixed;
+	bottom:0;
+}
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+<!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
+<script>
+var chat = io.connect('http://localhost/chat') //This needs to be changed when on everything else than localhost!
+
+
+
+var one = io('/one');
+$login = false;
+  var socket = io();
+  socket.on('connect', function (data) {
+    $('#s').html('Connected');
+  });
+
+if($login == false){
+	document.addEventListener('keydown', function(e) {
+  if(e.keyCode == 13){
+  	$login = true;
+  	$user = $('#username').val()
+	if($user == ''){}
+		else{
+			socket.emit('username', { username : $user})
+		}
+  }
+});
+}
+
+socket.on('upd', function(d){
+	console.log(d.usr);
+	window.usrc = d.usr;
+})
+
+socket.on('full', function(){
+	$('#full').modal('open');
+})
+
+
+socket.on('rp-ret', function(){
+socket.join('one');
+socket.emit('newusrone');
+
+if(window.usrc == 1){
+	$xo = 0;
+}else{
+	$xo = 1;
+}
+console.log('RP-ret');
+    canv();
+	one.emit('getxo');
+	$('#choose').fadeOut('slow');
+	setTimeout(function(){
+		$('#mycanv').fadeIn('slow');
+	},700);
+	$('.canv').css({
+		'display':'block'
+	});
+	
+    $('li').on('click', function(){
+    	$tclass = this.className;
+    	one.emit('elem', {
+    		username : $user,
+    		xo: $xo,
+    		tclass : $tclass
+    	})
+    })
+	
+})
+$('#rp').on('click',function(){	
+	socket.emit('play', { 
+		username : $user,
+		gametype : 'rp'
+	});
+})
+$('#ai').on('click',function(){
+	socket.emit('play', { 
+		username : $user,
+		gametype : 'ai'
+	});
+})
+$('#login').on('click',function(){
+	$login = true;
+	$user = $('#username').val()
+	if($user == ''){}
+		else{
+			socket.emit('username', { username : $user})
+		}
+})
+
+
+socket.on('granted', function(){
+	$('.start').fadeOut('slow');
+	setTimeout(function(){
+	$('#panel').fadeIn('slow');	
+},400);
+	
+})
+
+
+
+$('.modal').modal();
+function canv(){
+	 var c = document.getElementById("mycanv");
+	var canvas = c.getContext("2d");
+    canvas.lineWidth = 1;
+    canvas.strokeStyle = "#fff";
+    //vertical lines
+    canvas.beginPath();
+    canvas.moveTo(100, 0);
+    canvas.lineTo(100.5, 150);
+    canvas.closePath();
+    canvas.stroke();
+    canvas.beginPath();
+    canvas.moveTo(200, 0);
+    canvas.lineTo(200, 150);
+    canvas.closePath();
+    canvas.stroke();
+
+    // horizontal lines
+    canvas.lineWidth = .5;
+
+    canvas.beginPath();
+    canvas.moveTo(0, 50);
+    canvas.lineTo(300, 50);
+    canvas.closePath();
+    canvas.stroke();
+      
+    canvas.beginPath();
+    canvas.moveTo(0, 100);
+    canvas.lineTo(300, 100);
+    canvas.closePath();
+    canvas.stroke();  
+    canvas.translate(0.5, 0.5);
+
+}
+
+
+//TO-DO list
+//---------------------------------------
+//Remember to add socket.leave('room')
+</script>
+
+</html>
