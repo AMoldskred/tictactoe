@@ -15,8 +15,11 @@ function handler (req, res) {
     res.end(data);
   });
 }
+
 numusr = 0;
-var one = io.of('/one');
+
+
+
 io.on('connection', function (socket) {
 	console.log('New connect');
 	socket.emit('connect');
@@ -30,19 +33,15 @@ socket.on('disconnect', function(){
         console.log('Disconnect');
     });
 
-socket.on('newusrone', function(d){
-  numusr++;
-})
+
 socket.on('remusrone', function(){
-  numusr--;
+  socket.leave('one');
 })
 
+
+
+
 socket.on('play', function(data){
-  setTimeout(function(){
- socket.emit('upd', {
-  usr: numusr
-}); 
-}, 10000);
   console.log('Entering game:')
         if(data.gametype == 'ai'){
           socket.emit('ai');
@@ -50,24 +49,41 @@ socket.on('play', function(data){
         }
         else if(data.gametype == 'rp'){
           if(numusr < 2){
+
             //Game start
             //----------------------
+            socket.emit('upd', {
+            usr: numusr
+            }); 
             socket.emit('rp-ret');
-          one.on('elem', function(d){
-            one.broadcast.emit('newmove', {
+
+              socket.join('one');
+               numusr++;
+               if(numusr == 2){
+                console.log('Start game');
+                socket.in('one').emit('start');
+              }
+
+              
+          socket.on('elem', function(d){
+            console.log('Player '+d.xo+' chose square: '+d.tclass);
+            socket.to('one').emit('elem', {
               user: d.username,
               xo: d.xo,
               move: d.tclass
             });
+
           });
+
           }else{
             socket.emit('full');
           }
-          console.log(numusr+' players in room one');
+          console.log(numusr+' player/s in room one');
           console.log('Real player');
       socket.on('disconnect', function(){
         console.log('Disconnect');
         numusr--;
+        socket.to('one').emit('left');
       });
         }
     });

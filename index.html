@@ -42,16 +42,7 @@
 <p class="center bottom" style="width:100vw">Status: <span id="s">Not connected</span></p>
 </div>
 
-<!-- Modal Structure -->
-  <div id="full" class="modal">
-    <div class="modal-content">
-      <h4>The lobby was full</h4>
-      <p>Sorry, please try again later</p>
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-    </div>
-  </div>
+
 
 </body>
 <style>
@@ -81,6 +72,7 @@ li{
 
 	display:none;
 	margin:auto;
+	position:absolute;
 	left:0;
 	right:0;
 	top:0;
@@ -91,28 +83,46 @@ li{
 }
 #panel{
 	background-color:white;
-	margin-top:10%;
 	display:none;
 	width:100vw;
-	height:80%;
+	height:95%;
 
 }
 .bottom{
 	position:fixed;
 	bottom:0;
 }
-
+.x{
+}
+.o{
+}
+.toast{
+	top:5;
+	right:5;
+	background-color:#428bca;
+}
+.mark{
+	font-size: calc(4vh + 4vw + 2vmin);
+	display:block;
+	margin:0 auto;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	text-align: center;
+    vertical-align: middle;
+    color:white;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
 <!-- Compiled and minified JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
 <script>
-var chat = io.connect('http://localhost/chat') //This needs to be changed when on everything else than localhost!
 
 
 
-var one = io('/one');
+
 $login = false;
   var socket = io();
   socket.on('connect', function (data) {
@@ -132,28 +142,68 @@ if($login == false){
 });
 }
 
+
+
+
 socket.on('upd', function(d){
 	console.log(d.usr);
 	window.usrc = d.usr;
 })
 
 socket.on('full', function(){
-	$('#full').modal('open');
+	Materialize.toast('Game is full, try later', 4000, 'toast');
 })
 
 
-socket.on('rp-ret', function(){
-socket.join('one');
-socket.emit('newusrone');
 
-if(window.usrc == 1){
+socket.on('rp-ret', function(){
+$gameready = 0;
+
+socket.on('up', function(){
+	console.log('Connection to room ONE');
+});
+socket.on('start', function(){
+	console.log('Game ready');
+	if($xo == 0){
+		$gameready = 1;
+	}
+	else if($xo == 1){
+		$gameready = 0;
+		console.log('Player 0s turn');
+	}
+});
+socket.on('elem', function(e){
+	console.log('Player '+e.xo+' chose square: '+e.move);
+	if(e.xo == 0){
+	$('.'+e.move).addClass("x");
+	$('.'+e.move).append('<i class="material-icons mark">cancel</i>');	
+	hei();
+    }else{
+	$('.'+e.move).addClass("o");
+	$('.'+e.move).append('<i class="material-icons mark">radio_button_unchecked</i>');
+		hei();
+    }
+	
+	if(e.xo == $xo){
+		$gameready = 0;
+
+	}
+	else{
+		$gameready = 1;
+	}
+});
+
+
+if(window.usrc < 1){
 	$xo = 0;
+	Materialize.toast('You are X', 4000, 'toast');
 }else{
 	$xo = 1;
+	Materialize.toast('You are O', 4000, 'toast');
 }
+
 console.log('RP-ret');
     canv();
-	one.emit('getxo');
 	$('#choose').fadeOut('slow');
 	setTimeout(function(){
 		$('#mycanv').fadeIn('slow');
@@ -163,15 +213,53 @@ console.log('RP-ret');
 	});
 	
     $('li').on('click', function(){
-    	$tclass = this.className;
-    	one.emit('elem', {
-    		username : $user,
-    		xo: $xo,
-    		tclass : $tclass
-    	})
+
+
+    	$item = $(this);
+    	var item = this.className;
+    	if($item.hasClass('x') || $item.hasClass('o')){
+    		$nottaken = false;
+
+    	}
+    	else{
+    		$nottaken = true;
+    	}
+    	console.log($nottaken);
+        if($gameready == 1 && $nottaken){
+    	 $tclass = this.className;
+    	 console.log('You are: '+$xo+' and chose: '+$tclass);
+    	 socket.emit('elem', {
+    		 username : $user,
+    		 xo: $xo,
+    		 tclass : $tclass
+    	 });
+    if($xo == 0){
+	$('.'+item).addClass("x");
+	$('.'+item).append('<i class="material-icons mark">cancel</i>');
+	hei();
+    }else{
+	$('.'+item).addClass("o");
+	$('.'+item).append('<i class="material-icons mark">radio_button_unchecked</i>');
+	hei();
+    }
+    	 $gameready = 0;
+    	}else{
+    		console.log('Not your turn / game has not started / spot taken');
+    	}
+
     })
-	
-})
+
+});
+
+function hei(){
+	$h = $('.1').height();
+	$hh = ($h - $('.mark').height())/2;
+	$('.mark').css({
+		'margin-top' : $hh
+	})
+}
+
+
 $('#rp').on('click',function(){	
 	socket.emit('play', { 
 		username : $user,
@@ -192,7 +280,14 @@ $('#login').on('click',function(){
 			socket.emit('username', { username : $user})
 		}
 })
-
+socket.on('left', function(){
+Materialize.toast('The other player left, reloading...', 5000, 'toast');
+setTimeout(function(){
+	window.location.reload();
+},5000)
+	
+	
+})
 
 socket.on('granted', function(){
 	$('.start').fadeOut('slow');
@@ -204,7 +299,6 @@ socket.on('granted', function(){
 
 
 
-$('.modal').modal();
 function canv(){
 	 var c = document.getElementById("mycanv");
 	var canvas = c.getContext("2d");

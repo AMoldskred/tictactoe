@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN' 'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg fill-opacity="1" xmlns:xlink="http://www.w3.org/1999/xlink" color-rendering="auto" color-interpolation="auto" text-rendering="auto" stroke="black" stroke-linecap="square" stroke-miterlimit="10" shape-rendering="auto" stroke-opacity="1" fill="black" stroke-dasharray="none" font-weight="normal" stroke-width="1" xmlns="http://www.w3.org/2000/svg" font-family="&apos;Dialog&apos;" font-style="normal" stroke-linejoin="miter" font-size="12" stroke-dashoffset="0" image-rendering="auto">
+  <!--Unicode Character 'COMBINING ENCLOSING CIRCLE' (U+20DD)-->
+  <defs id="genericDefs" />
+  <g>
+    <g>
+      <path d="M129.6562 200.6719 Q175.6406 200.6719 208.3359 233.4375 Q241.0312 266.2031 241.0312 312.1875 Q241.0312 358.1719 208.3359 390.8672 Q175.6406 423.5625 129.6562 423.5625 Q83.6719 423.5625 50.9062 390.8672 Q18.1406 358.1719 18.1406 312.1875 Q18.1406 266.2031 50.9062 233.4375 Q83.6719 200.6719 129.6562 200.6719 ZM129.6562 408.0938 Q168.8906 408.0938 197.2266 379.7578 Q225.5625 351.4219 225.5625 312.1875 Q225.5625 286.5938 212.625 264.3047 Q199.6875 242.0156 177.3984 229.1484 Q155.1094 216.2812 129.6562 216.2812 Q90.2812 216.2812 62.0156 244.5469 Q33.75 272.8125 33.75 312.1875 Q33.75 337.6406 46.6172 359.9297 Q59.4844 382.2188 81.7734 395.1562 Q104.0625 408.0938 129.6562 408.0938 Z" stroke="none" />
+    </g>
+  </g>
+</svg>
