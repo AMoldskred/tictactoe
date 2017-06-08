@@ -3,6 +3,8 @@ var io = require('socket.io')(app);
 var fs = require('fs');
 app.listen(80);
 
+
+
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
   function (err, data) {
@@ -17,7 +19,42 @@ function handler (req, res) {
 }
 
 numusr = 0;
+//Winning numbers
+$one = [1,2,3];
+$two = [4,5,6];
+$three = [7,8,9];
+$four = [1,4,7];
+$five = [2,5,8];
+$six = [3,6,9];
+$seven = [1,5,9];
+$eight = [3,5,7];
+$arrs = [$one, $two, $three, $four, $five, $six, $seven, $eight];
+//---------------------------------
 
+function containsAll(arrs, haystack){
+  $win = false;
+  for(var s = 0 , len = arrs.length; s < len; s++){
+    
+    $w = 0;
+    var ele = arrs[s]
+    
+  for(var i = 0 , lens = ele.length; i < lens; i++){
+    var elem = ele[i];
+    
+     if(haystack.indexOf(elem) == -1){}
+     else{
+      $w++;
+      if($w == 3){
+        $win = true;
+      }else{
+      
+      }
+
+  }
+  }
+}
+
+}
 
 
 io.on('connection', function (socket) {
@@ -38,6 +75,15 @@ socket.on('remusrone', function(){
   socket.leave('one');
 })
 
+
+
+function checko(){
+containsAll($arrs, $onum)
+}
+function checkx(){
+containsAll($arrs, $xnum)
+
+}
 
 
 
@@ -63,7 +109,8 @@ socket.on('play', function(data){
                 console.log('Start game');
                 socket.in('one').emit('start');
               }
-
+              $xnum = [];
+              $onum = [];
               
           socket.on('elem', function(d){
             console.log('Player '+d.xo+' chose square: '+d.tclass);
@@ -72,6 +119,43 @@ socket.on('play', function(data){
               xo: d.xo,
               move: d.tclass
             });
+
+            if(d.xo == 0){
+              $xusr = d.username;
+              var num = parseInt(d.tclass)
+              $xnum.push(num);
+              $xnum.sort(function(a, b){return a-b});
+              console.log($xnum);
+              if($xnum.length > 2){
+              checkx();
+              console.log($win);
+              if($win){
+                console.log('X wins')
+                socket.emit('win', {
+                  winner : 'X',
+                  usr : $xusr
+                })
+              } }
+            }else if(d.xo == 1){
+              $ousr = d.username;
+              var num = parseInt(d.tclass)
+              $onum.push(num);
+              $onum.sort(function(a, b){return a-b});
+              console.log($onum);
+              if($onum.length > 2){
+              checko();
+              console.log($win);
+              if($win){
+                console.log('O wins');
+                socket.emit('win', {
+                  winner : 'O',
+                  usr : $ousr
+                })
+              }
+
+              }
+              
+            }
 
           });
 
@@ -88,4 +172,4 @@ socket.on('play', function(data){
         }
     });
 
-});  
+}); 

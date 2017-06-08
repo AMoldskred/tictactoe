@@ -8,11 +8,11 @@
 <div id="panel" class="z-depth-5">
 
 <div id="choose">
-	<h1 class="center">Who do you want to play against?</h1>
+	<h1 class="center" style="color:#428bca">Who do you want to play against?</h1>
 	<div class="center" style="">
 
-    <button class="waves-effect waves-light btn-large " style="left:0; right:0;  margin: 0 auto; display:inline-block;" id="rp"><i class="material-icons" style="font-size: 40px">perm_identity</i></button>
-    <button class="waves-effect waves-light btn-large " style="left:0; right:0;  margin: 0 auto; display:inline-block;" id="ai"><i class="material-icons" style="font-size: 40px">android</i></button>
+    <button class="waves-effect waves-light btn-large tooltipped" style="left:0; right:0;  margin: 0 auto; display:inline-block;background-color:#428bca" id="rp" data-position="top" data-delay="50" data-tooltip="Real player"><i class="material-icons" style="font-size: 40px">perm_identity</i></button>
+    <button class="disabled btn-large tooltipped" style="left:0; right:0;  margin: 0 auto; display:inline-block;" id="ai"><i class="material-icons" style="font-size: 40px" data-position="top" data-delay="50" data-tooltip="Computer">android</i></button>
 
     </div>
     
@@ -34,9 +34,9 @@
 
 </div>
 <div class="start">
-	<h1 class="center">Please choose a username</h1>
+	<h1 class="center" style="color:#428bca">Please choose a username</h1>
 <input class="center"id="username" placeholder="Username"></input>
-<button class="waves-effect waves-light btn" style="left:0; right:0; margin:auto; display:block;" id="login">Join</button>
+<button class="waves-effect waves-light btn" style="left:0; right:0; margin:auto; display:block;background-color:#428bca !important;" id="login">Join</button>
 </div>
 <div>
 <p class="center bottom" style="width:100vw">Status: <span id="s">Not connected</span></p>
@@ -143,12 +143,22 @@ if($login == false){
 }
 
 
+socket.on('win', function(d){
 
+var ww = setInterval(function(){
+	$wintext = d.usr+' won the game!\nServer resetting';
+	Materialize.toast($wintext, 5000, 'toast');
+},1000);
+
+setTimeout(function(){
+window.location.reload();
+},5000);
+});
 
 socket.on('upd', function(d){
 	console.log(d.usr);
 	window.usrc = d.usr;
-})
+},5000)
 
 socket.on('full', function(){
 	Materialize.toast('Game is full, try later', 4000, 'toast');
@@ -164,11 +174,14 @@ socket.on('up', function(){
 });
 socket.on('start', function(){
 	console.log('Game ready');
+	clearInterval($wait);
 	if($xo == 0){
+		Materialize.toast('Game started, YOU start', 4000, 'toast');
 		$gameready = 1;
 	}
 	else if($xo == 1){
 		$gameready = 0;
+		Materialize.toast('Game started, X starts', 4000, 'toast');
 		console.log('Player 0s turn');
 	}
 });
@@ -197,6 +210,9 @@ socket.on('elem', function(e){
 if(window.usrc < 1){
 	$xo = 0;
 	Materialize.toast('You are X', 4000, 'toast');
+	$wait = setInterval(function(){
+    $toast = Materialize.toast('Waiting for a opponent...', 5000, 'toast');
+	}, 5200);
 }else{
 	$xo = 1;
 	Materialize.toast('You are O', 4000, 'toast');
@@ -219,7 +235,7 @@ console.log('RP-ret');
     	var item = this.className;
     	if($item.hasClass('x') || $item.hasClass('o')){
     		$nottaken = false;
-
+    		Materialize.toast('Spot taken', 4000, 'toast');
     	}
     	else{
     		$nottaken = true;
