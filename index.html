@@ -1,7 +1,9 @@
 <html>
 <head>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
- <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<title>Tic Tac Toe</title>
 </head>
 <body>
 
@@ -46,6 +48,7 @@
 
 </body>
 <style>
+
 body{
 	background-color:white;
 }
@@ -217,7 +220,12 @@ if(window.usrc < 1){
 	$xo = 1;
 	Materialize.toast('You are O', 4000, 'toast');
 }
-
+socket.on('tie', function(){
+		Materialize.toast('The game tied, server reloading...', 5000, 'toast');
+setTimeout(function(){
+	window.location.reload();
+},5000)
+	})
 console.log('RP-ret');
     canv();
 	$('#choose').fadeOut('slow');
@@ -227,12 +235,7 @@ console.log('RP-ret');
 	$('.canv').css({
 		'display':'block'
 	});
-	socket.on('tie', function(){
-		Materialize.toast('The game tied, server reloading...', 5000, 'toast');
-setTimeout(function(){
-	window.location.reload();
-},5000)
-	})
+	
     $('li').on('click', function(){
 
 
