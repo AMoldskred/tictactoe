@@ -227,7 +227,12 @@ console.log('RP-ret');
 	$('.canv').css({
 		'display':'block'
 	});
-	
+	socket.on('tie', function(){
+		Materialize.toast('The game tied, server reloading...', 5000, 'toast');
+setTimeout(function(){
+	window.location.reload();
+},5000)
+	})
     $('li').on('click', function(){
 
 

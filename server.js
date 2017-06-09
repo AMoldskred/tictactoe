@@ -135,7 +135,15 @@ socket.on('play', function(data){
                   winner : 'X',
                   usr : $xusr
                 })
-              } }
+                socket.to('one').emit('win', {
+                  winner : 'X',
+                  usr : $xusr
+                })
+              }else if($xnum.length == 5 && $win == false){
+              socket.emit('tie');
+              socket.to('one').emit('tie');
+            } 
+            }
             }else if(d.xo == 1){
               $ousr = d.username;
               var num = parseInt(d.tclass)
@@ -151,7 +159,14 @@ socket.on('play', function(data){
                   winner : 'O',
                   usr : $ousr
                 })
-              }
+                socket.to('one').emit('win', {
+                  winner : 'X',
+                  usr : $ousr
+                })
+              }else if($xnum.length == 5 && $win == false){
+              socket.emit('tie');
+              socket.to('one').emit('tie');
+            }
 
               }
               
